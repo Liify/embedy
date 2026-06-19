@@ -39,7 +39,7 @@ static void TIM6_Init(void) {
     RCC_APB1ENR1 |= (1U << 4);
 
     //strona 1184
-    // prescaler configuration, we want 1000ms and the clock is 4 mhz
+    // konfiguracja preskalera, chce 1000ms a zegar jest 4 mhz
     // 1000 = 4 000 000 / (PSC + 1)
     // PSC + 1 = 4000
     // PSC = 3999 = 4000 - 1

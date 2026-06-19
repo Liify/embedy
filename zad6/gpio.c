@@ -6,13 +6,13 @@ void GPIO_Init(GPIO_TypeDef *port, uint8_t pin, GPIO_Mode mode) {
     port->MODER |= ((uint32_t)mode << shift);
 }
 
-void GPIO_SetAlternateFunction(GPIO_TypeDef *port, uint8_t pin, uint8_t af_num) {
-    if (pin < 8) {
-    	// pins 0 through 7 use the low register AFRL
-        port->AFRL &= ~(0xFU << (pin * 4));     // clear 4 bits
-        port->AFRL |=  (af_num << (pin * 4));   // and set the new value
+void GPIO_SetAlternateFunction(GPIO_TypeDef *port, uint8_t pin, uint8_t af_num) { //przekazanie do LPUART
+    if (pin < 8) {//16pin * 4 bity = 64bit
+    	// piny 0-7 uzywaja AFRL strona 308
+        port->AFRL &= ~(0xFU << (pin * 4));     // wyczysc 4 bity
+        port->AFRL |=  (af_num << (pin * 4));   // nowa wartosc
     } else {
-    	// pins 8 through 15 use the high register AFRH
+    	// piny 8-15 uzywaja AFRH strona 307
         port->AFRH &= ~(0xFU << ((pin - 8) * 4));
         port->AFRH |=  (af_num << ((pin - 8) * 4));
     }

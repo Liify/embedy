@@ -4,19 +4,19 @@
 int main(void) {
     LPUART_init();
 
-    // send each letter of the alphabet one by one in a loop via sendchar
+    // lietry alfabetu jedna po drugiej przez sendchar
     unsigned char alphabet[] = "\r\nabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n";
     for (int i = 0; alphabet[i] != '\0'; i++) {
         LPUART_SendChar(alphabet[i]);
     }
 
-    // send a string via a custom function
-    unsigned char welcome_msg[] = "Welcome, Bartek\r\n";
+    // wyslanie stringa funkcja
+    unsigned char welcome_msg[] = "Witaj Mateusz\r\n";
     LPUART_SendString(welcome_msg);
 
     unsigned char current_char;
 
-    // live case switching for pressed letters
+    // dynamiczna zmiana wilekosci liter nacisnietych liter
     while (1) {
         LPUART_ReceiveChar(&current_char);
         if (current_char >= 'a' && current_char <= 'z') current_char -= 32;

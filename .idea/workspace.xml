@@ -3,12 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="f50055b2-27ab-4855-85ed-c84232e7fa16" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zad4/gpio.c" beforeDir="false" afterPath="$PROJECT_DIR$/zad4/gpio.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zad4/gpio.h" beforeDir="false" afterPath="$PROJECT_DIR$/zad4/gpio.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zad4/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/zad4/main.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zad5/gpio (2).c" beforeDir="false" afterPath="$PROJECT_DIR$/zad5/gpio (2).c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zad5/gpio (2).h" beforeDir="false" afterPath="$PROJECT_DIR$/zad5/gpio (2).h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/zad5/main 2 (1).c" beforeDir="false" afterPath="$PROJECT_DIR$/zad5/main 2 (1).c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zad6/gpio.c" beforeDir="false" afterPath="$PROJECT_DIR$/zad6/gpio.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zad6/gpio.h" beforeDir="false" afterPath="$PROJECT_DIR$/zad6/gpio.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zad6/lpuart.c" beforeDir="false" afterPath="$PROJECT_DIR$/zad6/lpuart.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zad6/lpuart.h" beforeDir="false" afterPath="$PROJECT_DIR$/zad6/lpuart.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

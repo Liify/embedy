@@ -3,15 +3,15 @@
 
 #include <stdint.h>
 
-// base address, p. 80
+// adresy strona 80
 #define RCC_BASE 0x40021000U
 #define LPUART1_BASE 0x40008000U
 
-// clock registers, p. 256
+// zegar register strona 256
 #define RCC_APB1ENR2 (*((volatile uint32_t *)(RCC_BASE + 0x5CU)))
-#define RCC_APB1ENR2_LPUART1EN (1U << 0)
+#define RCC_APB1ENR2_LPUART1EN (1U << 0) //wlaczenie zegara
 
-// lpuart structure, p. 1442
+// lpuart struktura strona 1442 co 4 bajty
 typedef struct {
     volatile uint32_t CR1;
     volatile uint32_t CR2;
@@ -30,16 +30,16 @@ typedef struct {
 
 #define LPUART1 ((LPUART_TypeDef *) LPUART1_BASE)
 
-// control register 1, p. 1428
-#define LPUART_CR1_UE (1U << 0)  // enabling uart
-#define LPUART_CR1_RE (1U << 2)  // enabling the receiver
-#define LPUART_CR1_TE (1U << 3)  // enabling the transmitter
+// Control register 1 (LPUART_CR1) strona 1430
+#define LPUART_CR1_UE (1U << 0)  // wlaczenie uart
+#define LPUART_CR1_RE (1U << 2)  // wlaczenie receivera
+#define LPUART_CR1_TE (1U << 3)  // wlaczenie transmitera
 
-// interrupt and status register definitions, p. 1438
-#define LPUART_ISR_RXNE (1U << 5) // check if read data is not empty
-#define LPUART_ISR_TXE  (1U << 7) // check if transfer data is empty
+// rejestr przerwania/stany strona 1438
+#define LPUART_ISR_RXNE (1U << 5) // niepuste dane
+#define LPUART_ISR_TXE  (1U << 7) // peły transfer
 
-// af8 alternate function
+// af8 funkcja alternatywna stm32 strona 109
 #define GPIO_AF8_LPUART1 8U
 
 int LPUART_init(void);

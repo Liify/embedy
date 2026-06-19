@@ -4,7 +4,7 @@ void GPIO_ClockEnable(GPIO_PortClock port) {
     RCC_AHB2ENR |= (uint32_t)port;
 }
 
-void GPIO_Init(GPIO_TypeDef *port, uint8_t pin, GPIO_Mode mode) {
+void GPIO_Init(GPIO_TypeDef *port, uint8_t pin, GPIO_Mode mode) { //przekazujesz do funkcji wskaźnik na całą strukturę portu i używasz operatora strzałki ->, aby dostać się do konkretnego rejestru
     uint32_t shift = (uint32_t)pin * 2U;
     port->MODER &= ~(0x3U << shift);
     port->MODER |= ((uint32_t)mode << shift);

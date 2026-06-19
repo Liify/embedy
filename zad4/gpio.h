@@ -3,35 +3,35 @@
 
 #include <stdint.h>
 
-// peripherals from 2.2.2, p. 77
-#define RCC_BASE 0x40021000U
+//peryferia
+#define RCC_BASE 0x40021000U //strona 76 ?
 #define PWR_BASE 0x40007000U
-#define GPIOB_BASE 0x48000400U
+#define GPIOB_BASE 0x48000400U //strona 77
 #define GPIOE_BASE 0x48001000U
 #define GPIOG_BASE 0x48001800U
 
-// offsets from 8.4, p. 305
-#define MODER_OFFSET 0x00U
-#define ODR_OFFSET 0x14U
-#define IDR_OFFSET 0x10U
+// offsety 303-305
+#define MODER_OFFSET 0x00U //wejscie/wyjscie
+#define ODR_OFFSET 0x14U //oczyt
+#define IDR_OFFSET 0x10U //diody
 
-// power registers, from 6.4, p. 251
-#define RCC_AHB2ENR (*((volatile uint32_t *)(RCC_BASE + 0x4CU)))
+// power registers 251/3
+#define RCC_AHB2ENR (*((volatile uint32_t *)(RCC_BASE + 0x4CU))) //adres glowny + przesuniecie, jako adres(volatile bo sie moze zmienic w kazdym momencie)*wyluskanie wskaznika
 #define RCC_APB1ENR1 (*((volatile uint32_t *)(RCC_BASE + 0x58U)))
-#define PWR_CR2 (*((volatile uint32_t *)(PWR_BASE  + 0x04U)))
+#define PWR_CR2 (*((volatile uint32_t *)(PWR_BASE  + 0x04U)))//185
 
-// GPIO register access macros
+// GPIO register makra dostepu
 #define GPIO_MODER(base) (*((volatile uint32_t *)((base) + MODER_OFFSET)))
 #define GPIO_ODR(base) (*((volatile uint32_t *)((base) + ODR_OFFSET)))
 #define GPIO_IDR(base) (*((volatile uint32_t *)((base) + IDR_OFFSET)))
 
-// arm systick
+// arm systick(programming 246)
 #define SYSTICK_BASE 0xE000E010U
 #define SYSTICK_CSR (*((volatile uint32_t *)(SYSTICK_BASE + 0x00U)))
 #define SYSTICK_RVR (*((volatile uint32_t *)(SYSTICK_BASE + 0x04U)))
 #define SYSTICK_CVR (*((volatile uint32_t *)(SYSTICK_BASE + 0x08U)))
 
-typedef enum {
+typedef enum { //we/wy/alt/analog
     GPIO_MODE_INPUT = 0x0U,
     GPIO_MODE_OUTPUT = 0x1U,
     GPIO_MODE_AF = 0x2U,

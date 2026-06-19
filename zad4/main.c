@@ -2,7 +2,7 @@
 
 #define TIME 1000
 
-// 4 displays (PB5-PB2)
+// 4 displays (PB5-PB2)sch9
 #define DISPLAY_PORT GPIOB_BASE
 #define DISPLAY_PIN_BASE 2U
 #define DISPLAY_PIN_COUNT 4U
@@ -22,9 +22,9 @@ static const uint8_t digits[10] = {
     0x6D, 0x7D, 0x07, 0x7F, 0x6F
 };
 
-static void board_init(void) {
-	// vddio2 power
-    RCC_APB1ENR1 |= (1U << 28); // 6.4.19, p. 253
+static void board_init(void) { //inicjalizacja plytki
+	// vddio2 izolowana domena zasilania
+    RCC_APB1ENR1 |= (1U << 28); // 6.4.19, p. 254
     PWR_CR2 |= (1U << 9); // 5.4.2, p. 185
 
     GPIO_ClockEnable(GPIO_PORT_B);
@@ -38,15 +38,15 @@ static void board_init(void) {
 
 volatile uint32_t system_ms = 0;
 
-void SysTick_Handler(void) {
+void SysTick_Handler(void) { //przerwanie co 1ms
     system_ms++;
 }
 
 static void SysTick_Init(void) {
 
-	// 4000U since the clock works at 4MHz
-    SYSTICK_RVR = 4000U - 1U;
-    // the actual counter
+	// 4000U zegar działa na 4MHz
+    SYSTICK_RVR = 4000U - 1U; //248
+    // licznik
     SYSTICK_CVR = 0U;
 
     // byte 0: enable the countdown
@@ -56,10 +56,10 @@ static void SysTick_Init(void) {
 }
 
 static void display_show(uint8_t pos, uint8_t val) {
-    GPIO_WriteMasked(DISPLAY_PORT, 0xFU << DISPLAY_PIN_BASE, 0U);
+    GPIO_WriteMasked(DISPLAY_PORT, 0xFU << DISPLAY_PIN_BASE, 0U); //gaszenie
     GPIO_WriteMasked(SEGMENT_PORT, SEGMENT_MASK, 0U);
 
-    GPIO_WriteMasked(SEGMENT_PORT, SEGMENT_MASK, digits[val]);
+    GPIO_WriteMasked(SEGMENT_PORT, SEGMENT_MASK, digits[val]); //zapalanie
     GPIO_WritePin(DISPLAY_PORT, 5U - pos, 1U);
 }
 

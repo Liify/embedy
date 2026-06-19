@@ -3,17 +3,17 @@
 
 #include <stdint.h>
 
-// peripherals from 2.2.2, p. 77
+// peripherals 77
 #define RCC_BASE 0x40021000U
 #define PWR_BASE 0x40007000U
 
-// power registers, from 6.4, p. 251
-#define RCC_AHB2ENR (*((volatile uint32_t *)(RCC_BASE + 0x4CU)))
+// power registers 251/3
+#define RCC_AHB2ENR (*((volatile uint32_t *)(RCC_BASE + 0x4CU))) //adres glowny + przesuniecie, jako adres(volatile bo sie moze zmienic w kazdym momencie)*wyluskanie wskaznika
 #define RCC_APB1ENR1 (*((volatile uint32_t *)(RCC_BASE + 0x58U)))
-#define PWR_CR2 (*((volatile uint32_t *)(PWR_BASE  + 0x04U)))
+#define PWR_CR2 (*((volatile uint32_t *)(PWR_BASE  + 0x04U)))//185
 
-// gpio structure, from 8.4.13, p. 311
-typedef struct {
+// gpio struktura 311
+typedef struct { //co 4 bajty
     volatile uint32_t MODER;
     volatile uint32_t OTYPER;
     volatile uint32_t OSPEEDR;
@@ -28,8 +28,8 @@ typedef struct {
     volatile uint32_t ASCR;
 } GPIO_TypeDef;
 
-// timer registers structure, from p. 1180
-typedef struct {
+// TIM registers 1180
+typedef struct { // sa co 4 bajty a zajmuja 2
     volatile uint16_t CR1;   uint16_t reserved0;
     volatile uint16_t CR2;   uint16_t reserved1;
     uint32_t reserved_gap1;
@@ -42,7 +42,7 @@ typedef struct {
     volatile uint16_t ARR;   uint16_t reserved7;
 } TIM_TypeDef;
 
-// register map, page 77
+// register map strona 77 ustawianie jako adres
 #define GPIOB ((GPIO_TypeDef *) 0x48000400U)
 #define GPIOE ((GPIO_TypeDef *) 0x48001000U)
 #define GPIOG ((GPIO_TypeDef *) 0x48001800U)

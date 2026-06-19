@@ -3,55 +3,40 @@
 
 #include <stdint.h>
 
-// peryferia strona 77
-#define RCC_BASE 0x40021000U //sterowanie zegarami
-#define PWR_BASE 0x40007000U //zarzadzanie zasilaniem
+// peripherals from 2.2.2, p. 77
+#define RCC_BASE 0x40021000U
+#define PWR_BASE 0x40007000U
+#define GPIOB_BASE 0x48000400U
+#define GPIOE_BASE 0x48001000U
+#define GPIOG_BASE 0x48001800U
 
-// strona 251
+// offsets from 8.4, p. 305
+#define MODER_OFFSET 0x00U
+#define ODR_OFFSET 0x14U
+#define IDR_OFFSET 0x10U
+
+// power registers, from 6.4, p. 251
 #define RCC_AHB2ENR (*((volatile uint32_t *)(RCC_BASE + 0x4CU)))
 #define RCC_APB1ENR1 (*((volatile uint32_t *)(RCC_BASE + 0x58U)))
 #define PWR_CR2 (*((volatile uint32_t *)(PWR_BASE  + 0x04U)))
 
-// gpio co 4 bajty
-typedef struct {
-    volatile uint32_t MODER;
-    volatile uint32_t OTYPER;
-    volatile uint32_t OSPEEDR;
-    volatile uint32_t PUPDR;
-    volatile uint32_t IDR;
-    volatile uint32_t ODR;
-    volatile uint32_t BSRR;
-    volatile uint32_t LCKR;
-    volatile uint32_t AFRL;
-    volatile uint32_t AFRH;
-    volatile uint32_t BRR;
-    volatile uint32_t ASCR;
-} GPIO_TypeDef;
+// GPIO register access macros
+#define GPIO_MODER(base) (*((volatile uint32_t *)((base) + MODER_OFFSET)))
+#define GPIO_ODR(base) (*((volatile uint32_t *)((base) + ODR_OFFSET)))
+#define GPIO_IDR(base) (*((volatile uint32_t *)((base) + IDR_OFFSET)))
 
-// timery
-typedef struct {
-    volatile uint16_t CR1;   uint16_t reserved0;
-    volatile uint16_t CR2;   uint16_t reserved1;
-    uint32_t reserved_gap1;
-    volatile uint16_t DIER;  uint16_t reserved2;
-    volatile uint16_t SR;    uint16_t reserved3;
-    volatile uint16_t EGR;   uint16_t reserved4;
-    uint32_t reserved_gap2[3];
-    volatile uint32_t CNT;
-    volatile uint16_t PSC;   uint16_t reserved6;
-    volatile uint16_t ARR;   uint16_t reserved7;
-} TIM_TypeDef;
-
-#define GPIOB ((GPIO_TypeDef *) 0x48000400U)
-#define GPIOE ((GPIO_TypeDef *) 0x48001000U)
-#define GPIOG ((GPIO_TypeDef *) 0x48001800U)
-#define TIM6 ((TIM_TypeDef *) 0x40001000U)
+// arm systick
+#define SYSTICK_BASE 0xE000E010U
+#define SYSTICK_CSR (*((volatile uint32_t *)(SYSTICK_BASE + 0x00U)))
+#define SYSTICK_RVR (*((volatile uint32_t *)(SYSTICK_BASE + 0x04U)))
+#define SYSTICK_CVR (*((volatile uint32_t *)(SYSTICK_BASE + 0x08U)))
 
 typedef enum {
     GPIO_MODE_INPUT = 0x0U,
     GPIO_MODE_OUTPUT = 0x1U,
+    GPIO_MODE_AF = 0x2U,
+    GPIO_MODE_ANALOG = 0x3U,
 } GPIO_Mode;
-
 
 typedef enum {
     GPIO_PORT_A = (1U << 0),
@@ -65,14 +50,16 @@ typedef enum {
 
 void GPIO_ClockEnable(GPIO_PortClock port);
 
-void GPIO_Init(GPIO_TypeDef *port, uint8_t pin, GPIO_Mode mode);
+void GPIO_Init(uint32_t base, uint8_t pin, GPIO_Mode mode);
 
-void GPIO_InitRange(GPIO_TypeDef *port, uint8_t start_pin, uint8_t count, GPIO_Mode mode);
+void GPIO_InitRange(uint32_t base, uint8_t start_pin, uint8_t count, GPIO_Mode mode);
 
-void GPIO_WritePin(GPIO_TypeDef *port, uint8_t pin, uint8_t value);
+void GPIO_WritePin(uint32_t base, uint8_t pin, uint8_t value);
 
-void GPIO_WriteMasked(GPIO_TypeDef *port, uint32_t mask, uint32_t value);
+void GPIO_WriteMasked(uint32_t base, uint32_t mask, uint32_t value);
 
-uint8_t GPIO_ReadPin(GPIO_TypeDef *port, uint8_t pin);
+uint8_t GPIO_ReadPin(uint32_t base, uint8_t pin);
+
+void delay(uint32_t cycles);
 
 #endif

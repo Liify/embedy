@@ -1,104 +1,89 @@
 #include "gpio.h"
 
-// 4 wyswietlacze (PB5-PB2)
-#define DISPLAY_PORT GPIOB
+#define TIME 1000
+
+// 4 displays (PB5-PB2)
+#define DISPLAY_PORT GPIOB_BASE
 #define DISPLAY_PIN_BASE 2U
 #define DISPLAY_PIN_COUNT 4U
 
-// jeden 7-segmentowy wyswietlacz (PG0-PG6)
-#define SEGMENT_PORT GPIOG
+// one 7-segment display (PG0-PG6)
+#define SEGMENT_PORT GPIOG_BASE
 #define SEGMENT_PIN_BASE 0U
 #define SEGMENT_PIN_COUNT 7U
 #define SEGMENT_MASK 0x7FU
 
 // joystick (PE15)
-#define JOYSTICK_PORT GPIOE
+#define JOYSTICK_PORT GPIOE_BASE
 #define JOYSTICK_PIN 15U
 
-static const uint8_t digits[10] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D,
-		0x07, 0x7F, 0x6F };
+static const uint8_t digits[10] = {
+    0x3F, 0x06, 0x5B, 0x4F, 0x66,
+    0x6D, 0x7D, 0x07, 0x7F, 0x6F
+};
 
 static void board_init(void) {
-	// vddio2
-	RCC_APB1ENR1 |= (1U << 28);
-	PWR_CR2 |= (1U << 9);
+	// vddio2 power
+    RCC_APB1ENR1 |= (1U << 28); // 6.4.19, p. 253
+    PWR_CR2 |= (1U << 9); // 5.4.2, p. 185
 
-	GPIO_ClockEnable(GPIO_PORT_B);
-	GPIO_ClockEnable(GPIO_PORT_E);
-	GPIO_ClockEnable(GPIO_PORT_G);
+    GPIO_ClockEnable(GPIO_PORT_B);
+    GPIO_ClockEnable(GPIO_PORT_E);
+    GPIO_ClockEnable(GPIO_PORT_G);
 
-	GPIO_InitRange(DISPLAY_PORT, DISPLAY_PIN_BASE, DISPLAY_PIN_COUNT,
-			GPIO_MODE_OUTPUT);
-	GPIO_InitRange(SEGMENT_PORT, SEGMENT_PIN_BASE, SEGMENT_PIN_COUNT,
-			GPIO_MODE_OUTPUT);
-	GPIO_Init(JOYSTICK_PORT, JOYSTICK_PIN, GPIO_MODE_INPUT);
+    GPIO_InitRange(DISPLAY_PORT, DISPLAY_PIN_BASE, DISPLAY_PIN_COUNT, GPIO_MODE_OUTPUT);
+    GPIO_InitRange(SEGMENT_PORT, SEGMENT_PIN_BASE, SEGMENT_PIN_COUNT, GPIO_MODE_OUTPUT);
+    GPIO_Init(JOYSTICK_PORT, JOYSTICK_PIN, GPIO_MODE_INPUT);
 }
 
-static void TIM6_Init(void) {
-	// tim6
-	RCC_APB1ENR1 |= (1U << 4);
+volatile uint32_t system_ms = 0;
 
-	// 1000 = 4 000 000 / (PSC + 1)
-	// PSC + 1 = 4000
-	// PSC = 3999 = 4000 - 1
-	TIM6->PSC = 4000U - 1U;
-
-	TIM6->ARR = 2U - 1U;
-
-	// wymuszamy update
-	TIM6->EGR |= (1U << 0);
-
-	// start zegara
-	TIM6->CR1 |= (1U << 0);
+void SysTick_Handler(void) {
+    system_ms++;
 }
 
-static void TIM6_Delay_ms() {
-	// czekamy na flage
-	while ((TIM6->SR & (1U << 0)) == 0) {
-	}
+static void SysTick_Init(void) {
 
-	TIM6->SR &= ~(1U << 0); // reset flagi
+	// 4000U since the clock works at 4MHz
+    SYSTICK_RVR = 4000U - 1U;
+    // the actual counter
+    SYSTICK_CVR = 0U;
+
+    // byte 0: enable the countdown
+    // byte 1: run systick_handler at 0
+    // byte 2: use the main cpu clock
+    SYSTICK_CSR = 0x07U;
 }
 
 static void display_show(uint8_t pos, uint8_t val) {
-	GPIO_WriteMasked(DISPLAY_PORT, 0xFU << DISPLAY_PIN_BASE, 0U);
-	GPIO_WriteMasked(SEGMENT_PORT, SEGMENT_MASK, 0U);
+    GPIO_WriteMasked(DISPLAY_PORT, 0xFU << DISPLAY_PIN_BASE, 0U);
+    GPIO_WriteMasked(SEGMENT_PORT, SEGMENT_MASK, 0U);
 
-	GPIO_WriteMasked(SEGMENT_PORT, SEGMENT_MASK, digits[val]);
-	GPIO_WritePin(DISPLAY_PORT, 5U - pos, 1U);
+    GPIO_WriteMasked(SEGMENT_PORT, SEGMENT_MASK, digits[val]);
+    GPIO_WritePin(DISPLAY_PORT, 5U - pos, 1U);
 }
 
 int main(void) {
-	board_init();
-	TIM6_Init();
+    board_init();
+    SysTick_Init();
 
-	int counter = 0;
+    int counter = 0;
+    uint32_t last_tick = 0;
 
-	uint16_t loop_cycles = 0;
+    while (1) {
+        display_show(3, (uint8_t)((counter / 1000) % 10)); delay(1000U);
+        display_show(2, (uint8_t)((counter / 100) % 10)); delay(1000U);
+        display_show(1, (uint8_t)((counter / 10) % 10)); delay(1000U);
+        display_show(0, (uint8_t)( counter % 10)); delay(1000U);
 
-	while (1) {
-		display_show(3, (uint8_t) ((counter / 1000) % 10));
-		TIM6_Delay_ms();
-		display_show(2, (uint8_t) ((counter / 100) % 10));
-		TIM6_Delay_ms();
-		display_show(1, (uint8_t) ((counter / 10) % 10));
-		TIM6_Delay_ms();
-		display_show(0, (uint8_t) (counter % 10));
-		TIM6_Delay_ms();
+        if ((system_ms - last_tick) >= 1000) {
+            last_tick = system_ms;
 
-		loop_cycles++;
-
-		// 125 * 8ms = 1000ms
-		if (loop_cycles >= 125) {
-			loop_cycles = 0;
-
-			if (GPIO_ReadPin(JOYSTICK_PORT, JOYSTICK_PIN) == 0) {
-				if (--counter < 0)
-					counter = 9999;
-			} else {
-				if (++counter > 9999)
-					counter = 0;
-			}
-		}
-	}
+            if (GPIO_ReadPin(JOYSTICK_PORT, JOYSTICK_PIN) == 0) {
+                if (--counter < 0) counter = 9999;
+            } else {
+                if (++counter > 9999) counter = 0;
+            }
+        }
+    }
 }
